@@ -87,6 +87,16 @@ bot.on('callback_query', (callbackQuery) => {
   bot.sendMessage(message.chat.id, `URL has been labeled with category "${category}"`)
 })
 
+bot.onText(/\/list/, (msg) => {
+  const chatId = msg.chat.id
+  bot.sendMessage(
+      chatId,
+        `${URLs.toString() || 'No bookmarks stored'}`, {
+          parse_mode: 'HTML'
+        }
+    )
+})
+
 // Listener (handler) for showcasing different keyboard layout
 bot.onText(/\/keyboard/, (msg) => {
   bot.sendMessage(msg.chat.id, 'Alternative keyboard layout', {
@@ -164,6 +174,7 @@ bot.onText(/\/start/, (msg) => {
             Available commands:
 
             /bookmark <b>URL</b> - save interesting article URL
+            /list - list currently saved bookmarks
         `, {
           parse_mode: 'HTML'
         }
