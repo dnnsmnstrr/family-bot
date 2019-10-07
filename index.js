@@ -1,50 +1,186 @@
-var express = require('express')
-var app = express()
-var bodyParser = require('body-parser')
-const axios = require('axios')
+require('dotenv').config()
+const TelegramBot = require('node-telegram-bot-api')
 
-app.use(bodyParser.json()) // for parsing application/json
-app.use(
-  bodyParser.urlencoded({
-    extended: true
-  })
-) // for parsing application/x-www-form-urlencoded
+const token = '803946702:AAHSWSx5KaAd_kaa7FSyCNeOvqNt7FnAilU' // process.env.TOKEN
+const bot = new TelegramBot(token, { polling: true })
 
-// This is the route the API will call
-app.post('/new-message', function (req, res) {
-  const { message } = req.body.message
+// In-memory storage
+const URLs = []
+const URLLabels = []
+let tempSiteURL = ''
 
-  // Each message contains "text" and a "chat" object, which has an "id" which is the chat id
+// telegram.on('text', (message) => {
+//   telegram.sendMessage(message.chat.id, 'Hello world')
+// })
 
-  if (!message || message.text.toLowerCase().indexOf('marco') < 0) {
-    // In case a message is not present, or if our message does not have the word marco in it, do nothing and return an empty response
-    return res.end()
+// Listener (handler) for telegram's /bookmark event
+bot.onText(/\/bookmark/, (msg, match) => {
+  const chatId = msg.chat.id
+  const url = match.input.split(' ')[1]
+  // 'msg' is the received Message from Telegram
+  // 'match' is the result of executing the regexp above on the text content
+  // of the message
+
+  if (url === undefined) {
+    bot.sendMessage(
+      chatId,
+      'Please provide URL of article!',
+    )
+    return
   }
 
-  // If we've gotten this far, it means that we have received a message containing the word "marco".
-  // Respond by hitting the telegram bot API and responding to the approprite chat_id with the word "Polo!!"
-  // Remember to use your own API toked instead of the one below  "https://api.telegram.org/bot<your_api_token>/sendMessage"
-  axios
-    .post(
-      'https://api.telegram.org/bot777845702:AAFdPS_taJ3pTecEFv2jXkmbQfeOqVZGER/sendMessage',
-    {
-      chat_id: message.chat.id,
-      text: 'Polo!!'
-    }
-    )
-    .then(response => {
-      // We get here if the message was successfully posted
-      console.log('Message posted')
-      res.end('ok')
-    })
-    .catch(err => {
-      // ...and here if it was not
-      console.log('Error :', err)
-      res.end('Error :' + err)
-    })
+  URLs.push(url)
+  bot.sendMessage(
+    chatId,
+    'URL has been successfully saved!'
+  )
 })
 
-// Finally, start our server
-app.listen(3000, function () {
-  console.log('Telegram app listening on port 3000!')
+// Listener (handler) for telegram's /label event
+bot.onText(/\/label/, (msg, match) => {
+  const chatId = msg.chat.id
+  const url = match.input.split(' ')[1]
+
+  if (url === undefined) {
+    bot.sendMessage(
+      chatId,
+      'Please provide URL of article!',
+    )
+    return
+  }
+
+  tempSiteURL = url
+  bot.sendMessage(
+        chatId,
+        'URL has been successfully saved!',
+    {
+      reply_markup: {
+        inline_keyboard: [[
+          {
+            text: 'Recipes',
+            callback_data: 'recipes'
+          }, {
+            text: 'Places to go',
+            callback_data: 'places'
+          }, {
+            text: 'Other',
+            callback_data: 'other'
+          }
+        ]]
+      }
+    }
+    )
+})
+
+// Listener (handler) for callback data from /label command
+bot.on('callback_query', (callbackQuery) => {
+  const message = callbackQuery.message
+  const category = callbackQuery.data
+
+  URLLabels.push({
+    url: tempSiteURL,
+    label: category
+  })
+
+  tempSiteURL = ''
+
+  bot.sendMessage(message.chat.id, `URL has been labeled with category "${category}"`)
+})
+
+// Listener (handler) for showcasing different keyboard layout
+bot.onText(/\/keyboard/, (msg) => {
+  bot.sendMessage(msg.chat.id, 'Alternative keyboard layout', {
+    'reply_markup': {
+      'keyboard': [['Sample text', 'Second sample'], ['Keyboard'], ['I\'m robot']],
+      resize_keyboard: true,
+      one_time_keyboard: true,
+      force_reply: true
+    }
+  })
+})
+
+// Inline keyboard options
+const inlineKeyboard = {
+  reply_markup: {
+    inline_keyboard: [
+      [
+        {
+          text: 'YES',
+          callback_data: JSON.stringify({
+            'command': 'mycommand1',
+            'answer': 'YES'
+          })
+        },
+        {
+          text: 'NO',
+          callback_data: JSON.stringify({
+            'command': 'mycommand1',
+            'answer': 'NO'
+          })
+        }
+      ]
+    ]
+  }
+}
+
+// Listener (handler) for showcasing inline keyboard layout
+bot.onText(/\/inline/, (msg) => {
+  bot.sendMessage(msg.chat.id, 'You have to agree with me, OK?', inlineKeyboard)
+})
+
+// Keyboard layout for requesting phone number access
+const requestPhoneKeyboard = {
+  'reply_markup': {
+    'one_time_keyboard': true,
+    'keyboard': [[{
+      text: 'My phone number',
+      request_contact: true,
+      one_time_keyboard: true
+    }], ['Cancel']]
+  }
+}
+
+// Listener (handler) for retrieving phone number
+bot.onText(/\/phone/, (msg) => {
+  bot.sendMessage(msg.chat.id, 'Can we get access to your phone number?', requestPhoneKeyboard)
+})
+
+// Handler for phone number request when user gives permission
+bot.on('contact', async (msg) => {
+  const phone = msg.contact.phone_number
+  bot.sendMessage(msg.chat.id, `Phone number saved: ${phone}`)
+})
+
+// Listener (handler) for telegram's /start event
+// This event happened when you start the conversation with both by the very first time
+// Provide the list of available commands
+bot.onText(/\/start/, (msg) => {
+  const chatId = msg.chat.id
+  bot.sendMessage(
+      chatId,
+        `
+            Welcome at <b>FamilyBot</b>,
+      
+            Available commands:
+        
+            /bookmark <b>URL</b> - save interesting article URL
+        `, {
+          parse_mode: 'HTML'
+        }
+    )
+})
+
+bot.onText(/\/start/, (msg) => {
+  const chatId = msg.chat.id
+  bot.sendMessage(
+      chatId,
+        `
+            Available commands:
+        
+            /bookmark <b>URL</b> - save interesting article URL
+
+        `, {
+          parse_mode: 'HTML'
+        }
+    )
 })
