@@ -1,0 +1,20 @@
+{
+	"name": "family-bot",
+	"version": "1.0.0",
+	"description": "A bot to streamline family communications",
+	"main": "server.js",
+	"scripts": {
+		"start": "micro",
+		"dev": "micro-dev",
+		"debug": "node --inspect node_modules/.bin/micro-dev"
+	},
+	"author": "dennismuensterer",
+	"license": "ISC",
+	"dependencies": {
+		"axios": "^0.19.0",
+		"body-parser": "^1.19.0",
+		"express": "^4.17.1",
+		"node-telegram-bot-api": "^0.30.0",
+		"telegram-bot-now": "^1.15.4"
+	}
+}
