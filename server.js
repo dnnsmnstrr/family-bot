@@ -1,4 +1,4 @@
-const bot = require('telegram-bot-now');
+const bot = require('telegram-bot-now')
 
 // please note that routes marked as optional will have defaults
 // provided unless defined.  for more information on the default
@@ -6,50 +6,50 @@ const bot = require('telegram-bot-now');
 
 var self = {
 	// optional
-	start: function(msg) {
-		return self.MSG.START;
-	},
+  start: function (msg) {
+    return self.MSG.START
+  },
 
 	// optional
-	undefined: () => {
-		return self.MSG.GREEK;
-	},
-
-	// optional 
-	version: () => {
-		return 1;
-	},
+  undefined: () => {
+    return self.MSG.GREEK
+  },
 
 	// optional
-	help: () => {
+  version: () => {
+    return 1
+  },
+
+	// optional
+  help: () => {
 		// command index
 
-		return bot.utils.help(self, 'The commands I can perform:\n\n\n%{help}');
-	},
+    return bot.utils.help(self, 'The commands I can perform:\n\n\n%{help}')
+  },
 
-	ping: () => {
+  ping: () => {
 		// checks the server's pulse
 
-		console.log('* ping');
-		return 'pong!';
-	},
+    console.log('* ping')
+    return 'pong!'
+  },
 
-	hello: (m) => {
+  hello: (m) => {
 		// an example of a greeting
 
-		m.reply({ text: 'Hi there, ' + m.username });
-	},
+    m.reply({ text: 'Hi there, ' + m.username })
+  },
 
-	MSG: {
-		START: `
+  MSG: {
+    START: `
 		Welcome to *Your Now Telegram Bot*.
 		To see what I'm capable of, type /help
 		`,
-		GREEK: `
-		The command you entered is Greek to me.  To see a list of 
+    GREEK: `
+		The command you entered is Greek to me.  To see a list of
 		supported commands, type /help
 		`
-	}
+  }
 }
 
 /*
@@ -64,7 +64,7 @@ $ npm install mongodb --save
 */
 
 // to use MongoDb, uncomment the code below and edit it with relevant
-// information.  You may delete the current implementation bodies as 
+// information.  You may delete the current implementation bodies as
 // they are stubs to make the scaffold work
 
 // const MongoDb = require('mongodb')
@@ -76,39 +76,39 @@ $ npm install mongodb --save
 
 var state = {
 	// remove the element below if using MongoDb
-	cache: {
-		[bot.info.username]: {
-			'test_username': { 'dialogue': [] },
-			null: {
-				bot: { username: 'test_bot' }
-			}
-		}
-	},
-	get(app, user, k) {
+  cache: {
+    [bot.info.username]: {
+      'test_username': { 'dialogue': [] },
+      null: {
+        bot: { username: 'test_bot' }
+      }
+    }
+  },
+  get (app, user, k) {
 		// if using MongoDb, remove the following
 		// lines and uncomment the code below it
 
-		var p = ['cache', app, user, k].join('/');
-		return Promise.resolve(
+    var p = ['cache', app, user, k].join('/')
+    return Promise.resolve(
 			this.getpath(p) || {route: ''}
-		);
+		)
 
 		// return dbc.db(dbn).collection(cnm)
 		// 	.then(t => t.find({app, user}))
 		// 	.then(ls => ls.toArray())
 		// 	.then(ls => (ls.length > 0 ? ls[0][k] : undefined) || {});
-	},
-	save(app, user, k, o) {
+  },
+  save (app, user, k, o) {
 		// if using MongoDb, remove the following
 		// lines and uncomment the code below it
 
-		var p = ['cache', app, user, k].join('/');
-		this.setpath(p, o);
-		return Promise.resolve({created: true, id: 0});
+    var p = ['cache', app, user, k].join('/')
+    this.setpath(p, o)
+    return Promise.resolve({created: true, id: 0})
 
 		// return dbc.db(dbn).collection(cnm)
 		// 	.then(t => t.updateOne({app, user}, o, {upsert: true}))
-	}
+  }
 }
 
-module.exports = bot.server(self, {state});
+module.exports = bot.server(self, {state})

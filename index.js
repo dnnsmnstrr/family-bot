@@ -9,8 +9,8 @@ const URLs = []
 const URLLabels = []
 let tempSiteURL = ''
 
-// telegram.on('text', (message) => {
-//   telegram.sendMessage(message.chat.id, 'Hello world')
+// bot.on('text', (message) => {
+//   bot.sendMessage(message.chat.id, 'Hello world')
 // })
 
 // Listener (handler) for telegram's /bookmark event
@@ -160,9 +160,9 @@ bot.onText(/\/start/, (msg) => {
       chatId,
         `
             Welcome at <b>FamilyBot</b>,
-      
+
             Available commands:
-        
+
             /bookmark <b>URL</b> - save interesting article URL
         `, {
           parse_mode: 'HTML'
@@ -170,13 +170,13 @@ bot.onText(/\/start/, (msg) => {
     )
 })
 
-bot.onText(/\/start/, (msg) => {
+bot.onText(/\/help/, (msg) => {
   const chatId = msg.chat.id
   bot.sendMessage(
       chatId,
         `
             Available commands:
-        
+
             /bookmark <b>URL</b> - save interesting article URL
 
         `, {
