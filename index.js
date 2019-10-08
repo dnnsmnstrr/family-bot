@@ -1,7 +1,7 @@
+import TelegramBot from 'node-telegram-bot-api'
+import firebase from 'firebase'
+import ogs from 'open-graph-scraper'
 require('dotenv').config()
-const ogs = require('open-graph-scraper')
-const firebase = require('firebase')
-const TelegramBot = require('node-telegram-bot-api')
 
 const token = process.env.TELEGRAM_BOT_KEY
 const bot = new TelegramBot(token, { polling: true })
