@@ -1,8 +1,24 @@
 require('dotenv').config()
+const ogs = require('open-graph-scraper')
+const firebase = require('firebase')
 const TelegramBot = require('node-telegram-bot-api')
 
-const token = '803946702:AAHSWSx5KaAd_kaa7FSyCNeOvqNt7FnAilU' // process.env.TOKEN
+const token = process.env.TELEGRAM_BOT_KEY
 const bot = new TelegramBot(token, { polling: true })
+
+const app = firebase.initializeApp({
+  apiKey: 'AIzaSyDyaZpW6hMifDRgsH2zDVDLk3rn_AlhuVc',
+  authDomain: 'muensterer-family-bot.firebaseapp.com',
+  databaseURL: 'https://muensterer-family-bot.firebaseio.com',
+  projectId: 'muensterer-family-bot',
+  storageBucket: 'muensterer-family-bot.appspot.com',
+  messagingSenderId: '829502478654',
+  appId: '1:829502478654:web:9639573d381c55628d346f',
+  measurementId: 'G-XS119B3XR5'
+})
+
+const ref = firebase.database().ref()
+const sitesRef = ref.child('sites')
 
 // In-memory storage
 const URLs = []
@@ -57,6 +73,10 @@ bot.onText(/\/label/, (msg, match) => {
       reply_markup: {
         inline_keyboard: [[
           {
+            text: 'Development',
+            callback_data: 'development'
+          },
+          {
             text: 'Recipes',
             callback_data: 'recipes'
           }, {
@@ -69,22 +89,38 @@ bot.onText(/\/label/, (msg, match) => {
         ]]
       }
     }
-    )
+  )
 })
 
 // Listener (handler) for callback data from /label command
 bot.on('callback_query', (callbackQuery) => {
-  const message = callbackQuery.message
-  const category = callbackQuery.data
+  const { message, category } = callbackQuery
 
-  URLLabels.push({
-    url: tempSiteURL,
-    label: category
+  // URLLabels.push({
+  //   url: tempSiteURL,
+  //   label: category
+  // })
+
+  ogs({ url: tempSiteURL }, function (results) {
+    if (results.success) {
+      sitesRef.push().set({
+        name: results.data.ogSiteName,
+        title: results.data.ogTitle,
+        description: results.data.ogDescription,
+        url: tempSiteURL,
+        thumbnail: results.data.ogImage.url,
+        category: category
+      })
+      bot.sendMessage(message.chat.id, 'Added "' + results.data.ogTitle + '" to category "' + callbackQuery.data + '"!')
+    } else {
+      sitesRef.push().set({
+        url: tempSiteURL
+      })
+      bot.sendMessage(message.chat.id, 'Added new website, but there was no OG data!')
+    }
   })
-
   tempSiteURL = ''
-
-  bot.sendMessage(message.chat.id, `URL has been labeled with category "${category}"`)
+  // bot.sendMessage(message.chat.id, `URL has been labeled with category "${category}"`)
 })
 
 bot.onText(/\/list/, (msg) => {
@@ -183,15 +219,23 @@ bot.onText(/\/start/, (msg) => {
 
 bot.onText(/\/help/, (msg) => {
   const chatId = msg.chat.id
+  const availableCommands = [
+    { title: 'bookmark', params: '<b>URL<b>', description: 'save interesting article URL' },
+    { title: 'label', params: '<b>URL<b>', description: 'save interesting article URL with label' },
+    { title: 'list', params: '', description: 'list saved bookmarks' }
+  ]
+  // ${availableCommands[0].title} <b>${availableCommands[0].params}<b> - ${availableCommands[0].description}
   bot.sendMessage(
-      chatId,
-        `
-            Available commands:
-
-            /bookmark <b>URL</b> - save interesting article URL
-
-        `, {
-          parse_mode: 'HTML'
-        }
-    )
+    chatId,
+    `
+        Available commands:
+        ${availableCommands.map(command => {
+          const line = '/' + command.title + ' ' + command.params + ' - ' + command.description
+          console.log('line', line)
+          return line
+        })}
+    `, {
+      parse_mode: 'HTML'
+    }
+  )
 })
