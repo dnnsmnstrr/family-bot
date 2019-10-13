@@ -8,10 +8,10 @@ const session = require('telegraf/session')
 require('dotenv').config()
 const TOKEN = process.env.TELEGRAM_BOT_KEY
 const PORT = process.env.PORT || 3000
-const URL = process.env.URL || 'https://muensterer-family-bot.herokuapp.com'
+const URL = process.env.URL || 'https://fuzzy-dingo-19.localtunnel.me'
 const bot = new Telegraf(TOKEN)
-bot.telegram.setWebhook(`${URL}/bot${TOKEN}`)
-bot.startWebhook(`/bot${TOKEN}`, null, PORT)
+// bot.telegram.setWebhook(`${URL}/bot${TOKEN}`)
+// bot.startWebhook(`/bot${TOKEN}`, null, PORT)
 
 // expressApp.get('/', (req, res) => {
 //   res.send('Hello World!')
@@ -48,6 +48,7 @@ bot.telegram.getMe().then((botInfo) => {
 bot.start(({ i18n, replyWithHTML }) => replyWithHTML(i18n.t('greeting')))
 bot.help((ctx) => ctx.reply('🆘'))
 
+bot.on('text', ({ replyWithHTML }) => replyWithHTML('<b>Hello</b>'))
 // greeting
 bot.on('sticker', (ctx) => ctx.reply('👍'))
 bot.hears('hi', (ctx) => ctx.reply('Hey there'))
@@ -123,5 +124,10 @@ bot.command('quit', (ctx) => {
 
 // Start bot polling in order to not terminate Node.js application.
 bot.startPolling()
-bot.launch()
+bot.launch({
+  webhook: {
+    domain: `${URL}/bot${TOKEN}`,
+    port: PORT
+  }
+})
 
