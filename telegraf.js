@@ -1,9 +1,6 @@
 const Telegraf = require('telegraf')
 const { Extra, Markup, Composer } = Telegraf
 
-const express = require('express')
-const expressApp = express()
-
 const path = require('path')
 
 const session = require('telegraf/session')
@@ -13,6 +10,7 @@ const PORT = process.env.PORT || 3000
 const URL = process.env.URL || 'https://muensterer-family-bot.herokuapp.com'
 const bot = new Telegraf(TOKEN)
 bot.telegram.setWebhook(`${URL}/bot${TOKEN}`)
+bot.startWebhook(`/bot${API_TOKEN}`, null, PORT)
 
 const TelegrafI18n = require('telegraf-i18n')
 const i18n = new TelegrafI18n({
@@ -117,3 +115,4 @@ bot.command('quit', (ctx) => {
 // Start bot polling in order to not terminate Node.js application.
 bot.startPolling()
 bot.launch()
+
