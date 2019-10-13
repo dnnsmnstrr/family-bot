@@ -13,13 +13,13 @@ const bot = new Telegraf(TOKEN)
 bot.telegram.setWebhook(`${URL}/bot${TOKEN}`)
 bot.startWebhook(`/bot${TOKEN}`, null, PORT)
 
-expressApp.get('/', (req, res) => {
-  res.send('Hello World!')
-})
-
-expressApp.listen(PORT, () => {
-  console.log(`Example app listening on port ${PORT}!`)
-})
+// expressApp.get('/', (req, res) => {
+//   res.send('Hello World!')
+// })
+//
+// expressApp.listen(PORT, () => {
+//   console.log(`Example app listening on port ${PORT}!`)
+// })
 
 const TelegrafI18n = require('telegraf-i18n')
 const i18n = new TelegrafI18n({
@@ -42,7 +42,7 @@ bot.command('de', ({ i18n, replyWithHTML }) => {
 // We can get bot nickname from bot informations. This is particularly useful for groups.
 bot.telegram.getMe().then((botInfo) => {
   bot.options.username = botInfo.username
-  console.log('Server has initialized bot nickname. Nick: ' + botInfo.username)
+  console.log('Server has initialized bot nickname. Nick: ' + botInfo.first_name)
 })
 
 bot.start(({ i18n, replyWithHTML }) => replyWithHTML(i18n.t('greeting')))
