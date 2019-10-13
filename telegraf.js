@@ -1,6 +1,7 @@
 const Telegraf = require('telegraf')
 const { Extra, Markup, Composer } = Telegraf
-
+const express = require('express')
+const expressApp = express()
 const path = require('path')
 
 const session = require('telegraf/session')
@@ -11,6 +12,14 @@ const URL = process.env.URL || 'https://muensterer-family-bot.herokuapp.com'
 const bot = new Telegraf(TOKEN)
 bot.telegram.setWebhook(`${URL}/bot${TOKEN}`)
 bot.startWebhook(`/bot${TOKEN}`, null, PORT)
+
+expressApp.get('/', (req, res) => {
+  res.send('Hello World!')
+})
+
+expressApp.listen(PORT, () => {
+  console.log(`Example app listening on port ${PORT}!`)
+})
 
 const TelegrafI18n = require('telegraf-i18n')
 const i18n = new TelegrafI18n({
