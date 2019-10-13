@@ -10,7 +10,7 @@ const PORT = process.env.PORT || 3000
 const URL = process.env.URL || 'https://muensterer-family-bot.herokuapp.com'
 const bot = new Telegraf(TOKEN)
 bot.telegram.setWebhook(`${URL}/bot${TOKEN}`)
-bot.startWebhook(`/bot${API_TOKEN}`, null, PORT)
+bot.startWebhook(`/bot${TOKEN}`, null, PORT)
 
 const TelegrafI18n = require('telegraf-i18n')
 const i18n = new TelegrafI18n({
