@@ -1,11 +1,18 @@
 const Telegraf = require('telegraf')
 const { Extra, Markup, Composer } = Telegraf
+
+const express = require('express')
+const expressApp = express()
+
 const path = require('path')
 
 const session = require('telegraf/session')
 require('dotenv').config()
-const token = process.env.TELEGRAM_BOT_KEY
-const bot = new Telegraf(token)
+const TOKEN = process.env.TELEGRAM_BOT_KEY
+const PORT = process.env.PORT || 3000
+const URL = process.env.URL || 'https://muensterer-family-bot.herokuapp.com'
+const bot = new Telegraf(TOKEN)
+bot.telegram.setWebhook(`${URL}/bot${TOKEN}`)
 
 const TelegrafI18n = require('telegraf-i18n')
 const i18n = new TelegrafI18n({
@@ -97,7 +104,7 @@ bot.on('inline_query', ctx => {
 // fun
 bot.hears('ymca', (ctx) => ctx.reply("*sing* It's fun to stay at the Y.M.C.A.!"))
 bot.hears('fuck', (ctx) => ctx.reply("That's not a nice thing to say, bitch!"))
-bot.command('rickroll', ({ reply }) => reply('Yo'))
+bot.command('rickroll', ({ reply }) => reply('https://www.youtube.com/watch?v=dQw4w9WgXcQ'))
 
 bot.command('quit', (ctx) => {
   // Explicit usage
