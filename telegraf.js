@@ -124,10 +124,10 @@ bot.command('quit', (ctx) => {
 
 // Start bot polling in order to not terminate Node.js application.
 bot.startPolling()
-bot.launch({
-  webhook: {
-    domain: `${URL}/bot${TOKEN}`,
-    port: PORT
-  }
-})
+// bot.launch({
+//   webhook: {
+//     domain: `${URL}/bot${TOKEN}`,
+//     port: PORT
+//   }
+// })
 
