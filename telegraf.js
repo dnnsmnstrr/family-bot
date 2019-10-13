@@ -13,13 +13,11 @@ const bot = new Telegraf(TOKEN)
 // bot.telegram.setWebhook(`${URL}/bot${TOKEN}`)
 // bot.startWebhook(`/bot${TOKEN}`, null, PORT)
 
-// expressApp.get('/', (req, res) => {
-//   res.send('Hello World!')
-// })
-//
-// expressApp.listen(PORT, () => {
-//   console.log(`Example app listening on port ${PORT}!`)
-// })
+expressApp.use(bot.webhookCallback(`/bot${TOKEN}`))
+
+expressApp.get('/', (req, res) => {
+  res.send('Hello World!')
+})
 
 const TelegrafI18n = require('telegraf-i18n')
 const i18n = new TelegrafI18n({
@@ -123,11 +121,14 @@ bot.command('quit', (ctx) => {
 })
 
 // Start bot polling in order to not terminate Node.js application.
-bot.startPolling()
-// bot.launch({
-//   webhook: {
-//     domain: `${URL}/bot${TOKEN}`,
-//     port: PORT
-//   }
-// })
+// bot.startPolling()
+bot.launch({
+  // webhook: {
+  //   domain: `${URL}/bot${TOKEN}`,
+  //   port: PORT
+  // }
+})
 
+expressApp.listen(PORT, () => {
+  console.log(`Example app listening on port ${PORT}!`)
+})
